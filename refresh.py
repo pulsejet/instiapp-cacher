@@ -3,6 +3,7 @@ import requests
 import shutil
 import os
 import errno
+from PIL import Image
 
 ROOT = '/var/www/instiapp/'
 EVENTS = 'https://insti.app/api/events'
@@ -35,6 +36,10 @@ def download_image(url):
             with open(filename, 'wb') as f:
                 img.raw.decode_content = True
                 shutil.copyfileobj(img.raw, f)
+
+            # Convert progressive to standard JPEG
+            image = Image.open(filename).convert('RGB')
+            image.save(filename, 'JPEG', quality=100, optimize=False, progressive=False)
 
     return url.replace(IMG_PREFIX, REPL_PREFIX)
 
