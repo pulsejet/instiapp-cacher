@@ -16,9 +16,10 @@ def get_path(url):
     return url.replace(IMG_PREFIX, '')
 
 def download_image(url):
-    print('Downloading', url)
-    
+    # Get the target file path    
     filename = ROOT + 'images/' + get_path(url)
+
+    # Make directories recursively
     if not os.path.exists(os.path.dirname(filename)):
         try:
             os.makedirs(os.path.dirname(filename))
@@ -26,11 +27,15 @@ def download_image(url):
             if exc.errno != errno.EEXIST:
                 raise
 
-    img = requests.get(url, stream=True)
-    if img.status_code == 200:
-        with open(filename, 'wb') as f:
-            img.raw.decode_content = True
-            shutil.copyfileobj(img.raw, f)
+    # Check if the file already exists
+    if not os.path.isfile(filename):
+        print('Downloading', url)
+        img = requests.get(url, stream=True)
+        if img.status_code == 200:
+            with open(filename, 'wb') as f:
+                img.raw.decode_content = True
+                shutil.copyfileobj(img.raw, f)
+
     return url.replace(IMG_PREFIX, REPL_PREFIX)
 
 # Get images
